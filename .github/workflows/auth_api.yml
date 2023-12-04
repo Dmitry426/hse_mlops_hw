@@ -51,6 +51,7 @@ jobs:
         mypy --html-report reports/src/mypy/ ./src || true
 
     - name: Upload reports
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v3
       with:
         name: html_reports
