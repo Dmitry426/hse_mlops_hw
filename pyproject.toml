@@ -1,0 +1,112 @@
+[tool.poetry]
+name = "hse-mlops-hw"
+version = "0.1.0"
+description = ""
+authors = ["DK <d.kachkin@tnxholding.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+pre-commit = "^3.5.0"
+pylint = "^3.0.2"
+isort = "^5.12.0"
+mypy = "^1.7.1"
+pylint-json2html = "^0.5.0"
+
+[tool.black]
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.tox
+  | venv
+  | build
+  | dist
+)/
+'''
+
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+
+[tool.mypy]
+warn_redundant_casts = true
+warn_unused_ignores = false
+warn_no_return = true
+warn_unreachable = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = "*.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
+[tool.pylint.main]
+fail-under = 10
+ignore = ["data"]
+ignored-modules = ["test"]
+py-version = "3.10"
+suggestion-mode = true
+output-format= ['json']
+
+[tool.pylint.basic]
+
+bad-names = ["foo", "bar", "baz", "toto", "tutu", "tata"]
+class-attribute-naming-style = "any"
+class-const-naming-style = "UPPER_CASE"
+class-naming-style = "PascalCase"
+const-naming-style = "UPPER_CASE"
+function-naming-style = "snake_case"
+property-classes = ["abc.abstractproperty"]
+
+
+[tool.pylint.format]
+ignore-long-lines = "^\\s*(# )?<?https?://\\S+>?$"
+indent-after-paren = 4
+indent-string = "    "
+max-line-length = 88
+max-module-lines = 1000
+
+
+[tool.pylint.messages_control]
+disable = [
+    "missing-docstring",
+    "too-few-public-methods",
+    "too-many-arguments",
+]
+
+
+good-names = []
+
+[tool.pylint.logging]
+logging-format-style = "old"
+logging-modules = ["logging"]
+
+
+[tool.pylint.similarities]
+ignore-imports = true
+ignore-docstrings = true
+ignore-comments = true
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(levelname)-5.5s [%(name)s] %(message)s"
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
