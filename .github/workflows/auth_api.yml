@@ -43,8 +43,7 @@ jobs:
 
     - name: Lint with pylint
       run: |
-        pylint src || pylint src --output-format=pylint_report.CustomJsonReporter --load-plugins = "pylint_report"  |
-        pylint_report > reports/src/pylint/report.html | false
+        pylint src || pylint src --output-format=pylint_report.CustomJsonReporter --load-plugins = "pylint_report"  | pylint_report > reports/src/pylint/report.html | false
 
 
     - name: Check typing with mypy
