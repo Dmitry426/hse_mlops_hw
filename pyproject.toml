@@ -7,6 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+pylint-report = "^2.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -57,10 +58,8 @@ ignore = ["data"]
 ignored-modules = ["test"]
 py-version = "3.10"
 suggestion-mode = true
-output-format= ['json']
 
 [tool.pylint.basic]
-
 bad-names = ["foo", "bar", "baz", "toto", "tutu", "tata"]
 class-attribute-naming-style = "any"
 class-const-naming-style = "UPPER_CASE"
@@ -88,9 +87,6 @@ disable = [
 
 good-names = []
 
-[tool.pylint.logging]
-logging-format-style = "old"
-logging-modules = ["logging"]
 
 
 [tool.pylint.similarities]
