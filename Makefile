@@ -13,10 +13,20 @@ black:
 	black .
 
 mypy:
-	mypy -p src
+	mypy -p hse_mlops_hw
+
+flake8:
+	flake8 .
 
 pylint:
-	pylint src
+	pylint hse_mlops_hw
 
-lint: isort black mypy  pylint
+lint: isort black mypy pylint flake8
 
+check_and_rename_env:
+	  @if [ -e ".env" ]; then \
+        echo "env file exists."; \
+      else \
+      	cp .env.example .env | \
+        echo "File does not exist."; \
+      fi
