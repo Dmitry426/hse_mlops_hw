@@ -1,87 +1,61 @@
-## Запуск приложения
+# HSE MLops Project 
+
+## Application Launch
 
 ### Development
 
-Для запуска приложения в среде разработки доступны варианты запуска напрямую через `python` и
-через `docker-compose`. Оба варианта используют для конфигурации переменные окружения, которые
-описаны в файле `app/core/config.py`. В данных режимах запуска доступно обновление кода приложения
-на лету, без перезапуска (кроме случаев добавления новых зависимостей).
+To launch the application in the development environment,
+there are options to run it directly using python and through 
+docker-compose. Both options use environment variables for configuration, 
+which are described in the app/settings/settings.py file. 
+In these run modes, it's possible to update the application code on the fly without restarting 
+(except when adding new dependencies).
+
 
 #### Python Runner
 
 ```bash
-python -m app
+python -m hse_mlops_hw
 ```
 
-#### Docker runner
+#### Docker mlfow runner 
+You can use local mlflow  
+
+```bash
+make build compose
+```
+
+This command will create a .env file from .env.example and build the containers with mlflow.
 
 ```bash
 docker-compose up -d
 ```
 
-### Production docker
+
+#### Project linting:
+You can lint project by running  
 
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+make lint
 ```
 
-## Разработка
 
-Команда для создания или апдейта базы:
+### Before You Begin
 
-```bash
-docker-compose exec app flask db upgrade
-```
-
-Команда для создания новой миграции:
-
-```bash
-docker-compose exec app flask db migrate -m "<migrate_name>"
-```
-
-Команда для создания суперюзера:
-
-```bash
-docker-compose exec app flask create_superuser -u <"username"> -p <"Password">
-```
-
-Регистрация проверяет пароль на валидность (минимум 8 символов, одна большая, одна маленькая буква,
-одна цифра и один спец знак) {"login":"test","password":"Test1990!"}
-
-При логине в сессию записывается user_agent устройства. Ключ рефреш токена создаются из айди и
-юзер_агента пользователя в ответе получаете access_token и refresh_token (они Bearer)
-
-для рефреша токена нужно в теле отправить рефреш токен ({"refresh_token":"<refresh_token>"})
-
-Логаут записывает access токен в редис для невалидности след запросов с ним а также удаляет рефреш
-токен из редиса чтобы с ним нельзя было запросить новый access_token
-
-### Перед началом работы
 
 ```bash
 make dev
 ```
 
-Это позволит проверить внесённые изменения до их сохранения.
+This command to set up pre commit config in order to check your code before commit 
 
-### Зависимости
+### Dependency's
 
-Управлением зависимостями занимается утилита `poetry`. \
-Перечень зависимостей находится в файле `pyproject.toml`. \
-Инструкция по настройке poetry-окружения для
-pyCharm [здесь](https://www.jetbrains.com/help/pycharm/poetry.html).
+Dependency management is handled by the poetry utility. 
+The list of dependencies is in the pyproject.toml file. 
+Instructions for setting up a poetry environment for PyCharm can be found here.
+To add a dependency, simply write poetry add requests,
+and the utility will automatically choose a version that does not conflict with current dependencies. 
+Dependencies with exact versions are recorded in the poetry.lock file. To get a dependency tree, you can use the command poetry show --tree. 
+Other commands are available in the official documentation for the utility.
 
-Для добавления зависимости достаточно написать `poetry add requests`, утилита сама подберёт версию,
-не конфликтующую с текущими зависимостями. \
-Зависимости с точными версиями фиксируются в файл `poetry.lock`. \
-Для получения дерева зависимостей можно воспользоваться командой `poetry show --tree`. Остальные
-команды доступны в официальной документации к утилите.
-
-### Тестирование
-
-Тесты оформлены в виде полностью независимого решения, в котором не используется код основной
-программы. Для запуска тестирования достаточно вызвать в корне проекта команду
-
-```bash
-make test
-```

@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:14.0-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "$POSTGRES_USER",'-d','$POSTGRES_DB' ]
+      interval: 5s
+      retries: 5
+    restart: on-failure
+
+  ml_flow1:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/mlflow/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0 --backend-store-uri postgresql://tests:tests@postgres:5432/mlflow
+    restart: on-failure
+
+volumes:
+  postgres:
