@@ -129,4 +129,3 @@ log_cli_format = "%(levelname)-5.5s [%(name)s] %(message)s"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
-
