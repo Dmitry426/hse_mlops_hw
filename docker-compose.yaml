@@ -28,8 +28,18 @@ services:
       - ./.env
     ports:
       - "5000:5000"
-    command: mlflow server --host 0.0.0.0 --backend-store-uri postgresql://tests:tests@postgres:5432/mlflow
     restart: on-failure
+
+  tensorboard:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/tensorflow/Dockerfile
+    container_name: tensorboard
+    volumes:
+      - ./${TENSORBOARD_LOGS_DIR}/:/${TENSORBOARD_LOGS_DIR}/
+    ports:
+      - 6006:6006
+    command: tensorboard  --bind_all --logdir=/${TENSORBOARD_LOGS_DIR}/
 
 volumes:
   postgres:

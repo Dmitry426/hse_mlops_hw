@@ -15,6 +15,7 @@ from hse_mlops_hw.models.model import MyModel
 @hydra.main(config_path="../configs", config_name="config.yaml", version_base="1.3")
 def train(cfg: DictConfig):
     pl.seed_everything(42)
+
     torch.set_float32_matmul_precision("medium")
     dm = MyDataModule(cfg)
 
@@ -24,11 +25,14 @@ def train(cfg: DictConfig):
 
     loggers = [
         CSVLogger(
-            f"{output_folder}/logs/my-csv-logs", name=cfg.artifacts.experiment_name
+            f"{output_folder}/logs/train_csv", name=cfg.artifacts.experiment_name
         ),
         MLFlowLogger(
             experiment_name=cfg.artifacts.experiment_name,
             tracking_uri=cfg.artifacts.tracking_uri,
+        ),
+        pl.loggers.TensorBoardLogger(
+            f"{output_folder}/logs/tensorboard", name=cfg.artifacts.experiment_name
         ),
     ]
 

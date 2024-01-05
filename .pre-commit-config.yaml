@@ -2,12 +2,12 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-    -   id: trailing-whitespace  # убирает лишние пробелы
-    -   id: check-added-large-files  # проверяет тяжелые файлы на изменения
-    -   id: end-of-file-fixer  # добавляет пустую строку в конце файла
-    -   id: check-yaml  # проверяет синтаксис .yaml файлов
-    -   id: check-json  # проверяет синтаксис .json файлов
-    -   id: check-case-conflict  # проверяет файлы, которые могут конфликтовать в файловых системах без учета регистра.
+    -   id: trailing-whitespace
+    -   id: check-added-large-files
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-json
+    -   id: check-case-conflict
     -   id: check-merge-conflict
 
 -   repo: https://github.com/pycqa/isort

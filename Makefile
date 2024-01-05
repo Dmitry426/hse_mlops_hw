@@ -25,8 +25,12 @@ lint: isort black mypy pylint flake8
 
 check_and_rename_env:
 	  @if [ -e ".env" ]; then \
+    	chmod +r .env \
+    	. .env | \
         echo "env file exists."; \
       else \
       	cp .env.example .env | \
+      	chmod +r .env | \
+      	. .env | \
         echo "File does not exist."; \
       fi

@@ -26,7 +26,7 @@ In these run modes, it's possible to update the application code on the fly with
 You can use local mlflow
 
 ```bash
-make build compose
+make build
 ```
 
 This command will create a .env file from .env.example and build the containers with mlflow.
