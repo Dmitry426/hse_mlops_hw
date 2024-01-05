@@ -1,6 +1,9 @@
 __all__ = "MyDataModule"
 
+import logging
 import os
+import subprocess
+import sys
 
 import lightning.pytorch as pl
 import omegaconf
@@ -8,7 +11,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 
-from hse_mlops_hw.core.utils import run_dvc_pull
+logger = logging.getLogger(__name__)
 
 
 class CatDogDataset(Dataset):
@@ -60,7 +63,15 @@ class MyDataModule(pl.LightningDataModule):
         self.predict_dataset = None
 
     def prepare_data(self):
-        return run_dvc_pull()
+        try:
+            subprocess.run(["dvc", "pull"], check=True)
+            logger.info("DVC pull completed successfully.")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error: DVC pull failed with exit code {e.returncode}.")
+            sys.exit(e.returncode)
+        except OSError as e:
+            logger.error(f"Error: An unexpected error occurred - {e}")
+            sys.exit(1)
 
     def setup(self, stage=None):
         train_dataset = CatDogDataset(

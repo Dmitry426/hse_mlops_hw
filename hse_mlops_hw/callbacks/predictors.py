@@ -4,8 +4,9 @@ import csv
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Literal, Optional, Sequence
 
+import lightning.pytorch as pl
 import torch
 from lightning.fabric.loggers import CSVLogger
 from lightning.pytorch.callbacks import BasePredictionWriter
@@ -13,10 +14,16 @@ from lightning.pytorch.callbacks import BasePredictionWriter
 logger = logging.getLogger(__name__)
 
 
+# pylint: disable=unused-argument
 class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
     """Csv prediction writer"""
 
-    def __init__(self, output_dir: str, write_interval, name: str):
+    def __init__(
+        self,
+        output_dir: str,
+        name: str,
+        write_interval: Literal["batch", "epoch", "batch_and_epoch"] = "batch",
+    ):
         super().__init__(write_interval=write_interval)
         CSVLogger.__init__(self, root_dir=output_dir, name=name)
         self.output_dir = Path(output_dir)
@@ -30,11 +37,11 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
 
     def write_on_batch_end(
         self,
-        trainer,
-        pl_module,
-        prediction: List[torch.Tensor],
-        batch_indices,
-        batch,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        prediction: Any,
+        batch_indices: Optional[Sequence[int]],
+        batch: Any,
         batch_idx: int,
         dataloader_idx: int,
     ) -> None:
@@ -45,7 +52,11 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
         self.log_predictions_to_csv(prediction, batch_idx, name="predictions.csv")
 
     def write_on_epoch_end(
-        self, trainer, pl_module, predictions, batch_indices
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        predictions: Sequence[Any],
+        batch_indices: Sequence[Any],
     ) -> None:
         torch.save(
             predictions,
@@ -63,7 +74,7 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
 
     def log_predictions_to_csv(
         self,
-        predictions: List[torch.Tensor],
+        predictions: Sequence[Any],
         batch_idx: Optional[int] = None,
         name: Optional[str] = None,
     ) -> None:
