@@ -1,3 +1,5 @@
+__all__ = "MyDataModule"
+
 import os
 
 import lightning.pytorch as pl
@@ -6,7 +8,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 
-from hse_mlops_hw.services.utils import run_dvc_pull
+from hse_mlops_hw.core.utils import run_dvc_pull
 
 
 class CatDogDataset(Dataset):
@@ -19,8 +21,8 @@ class CatDogDataset(Dataset):
         for class_label in self.classes:
             class_path = os.path.join(root_dir, class_label)
             class_idx = self.classes.index(class_label)
-            for img_name in os.listdir(class_path):
-                img_path = os.path.join(class_path, img_name)
+            for img_name in os.listdir(str(class_path)):
+                img_path = os.path.join(str(class_path), img_name)
                 self.data.append((img_path, class_idx))
 
     def __len__(self):

@@ -23,11 +23,12 @@ psycopg2-binary = "^2.9.9"
 rich = "^13.7.0"
 psutil = "^5.9.7"
 timm = "^0.9.12"
+tensorboard = "^2.15.1"
 
 
 
 [tool.poetry.scripts]
-greet = "hse_mlops_hw.cmd.test:cli"
+greet = "hse_mlops_hw.cmd.commands:cli"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"
@@ -105,7 +106,9 @@ disable = [
     "too-many-arguments",
     "import-error",
     "arguments-differ",
-    "R0801"
+    "R0801",
+    "logging-fstring-interpolation",
+    "invalid-all-format"
 ]
 
 

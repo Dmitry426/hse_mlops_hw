@@ -1,3 +1,5 @@
+__all__ = "MyModel"
+
 from typing import Any
 
 import lightning.pytorch as pl
@@ -13,7 +15,7 @@ class MyModel(pl.LightningModule):
         self.save_hyperparameters()
         self.conf = conf
         self.backbone = transformers.AutoModel.from_pretrained(
-            conf["model"]["name"],
+            conf.model.name,
             return_dict=True,
             output_hidden_states=True,
         )

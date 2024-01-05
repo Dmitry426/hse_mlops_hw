@@ -39,7 +39,7 @@ artifacts:
   experiment_name: example-experiment
   tracking_uri: postgresql://test:test@localhost:5432/mlflow
   checkpoint:
-    use: True
+    use: False
     dirpath: ../data
     filename: "{epoch:02d}-{val_loss:.4f}"
     monitor: val_loss
