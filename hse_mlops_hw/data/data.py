@@ -4,9 +4,10 @@ import logging
 import os
 import subprocess
 import sys
+from typing import List, Union
 
 import lightning.pytorch as pl
-import omegaconf
+from omegaconf import DictConfig, ListConfig
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
@@ -15,10 +16,10 @@ logger = logging.getLogger(__name__)
 
 
 class CatDogDataset(Dataset):
-    def __init__(self, root_dir, transform=None):
+    def __init__(self, root_dir, classes: List, transform=None):
         self.root_dir = root_dir
         self.transform = transform
-        self.classes = ["cat", "dog"]
+        self.classes = classes
         self.data = []
 
         for class_label in self.classes:
@@ -42,7 +43,7 @@ class CatDogDataset(Dataset):
 
 
 class MyDataModule(pl.LightningDataModule):
-    def __init__(self, config: omegaconf.dictconfig.DictConfig):
+    def __init__(self, config: Union[DictConfig, ListConfig]):
         super().__init__()
         self.config = config
         self.train_folder = config.data.train_folder
@@ -57,7 +58,7 @@ class MyDataModule(pl.LightningDataModule):
                 transforms.ToTensor(),
             ]
         )
-        self.classes = ["cat", "dog"]
+        self.classes = config.labels
         self.train_dataset = None
         self.val_dataset = None
         self.predict_dataset = None
@@ -68,14 +69,13 @@ class MyDataModule(pl.LightningDataModule):
             logger.info("DVC pull completed successfully.")
         except subprocess.CalledProcessError as e:
             logger.error(f"Error: DVC pull failed with exit code {e.returncode}.")
-            sys.exit(e.returncode)
         except OSError as e:
             logger.error(f"Error: An unexpected error occurred - {e}")
             sys.exit(1)
 
     def setup(self, stage=None):
         train_dataset = CatDogDataset(
-            root_dir=self.train_folder, transform=self.transform
+            root_dir=self.train_folder, transform=self.transform, classes=self.classes
         )
         train_size = int((1.0 - self.val_size) * len(train_dataset))
         val_size = len(train_dataset) - train_size
@@ -84,7 +84,7 @@ class MyDataModule(pl.LightningDataModule):
         )
 
         self.predict_dataset = CatDogDataset(
-            root_dir=self.test_folder, transform=self.transform
+            root_dir=self.test_folder, transform=self.transform, classes=self.classes
         )
 
     def train_dataloader(self):

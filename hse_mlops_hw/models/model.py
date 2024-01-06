@@ -1,16 +1,18 @@
 __all__ = "MyModel"
 
-from typing import Any
+from typing import Any, Dict, Union
 
 import lightning.pytorch as pl
-import omegaconf
 import torch
 import transformers
+from lightning.pytorch.utilities.types import OptimizerLRScheduler
+from omegaconf import DictConfig, ListConfig
+from torch import Tensor
 
 
 # pylint: disable=unused-argument
 class MyModel(pl.LightningModule):
-    def __init__(self, conf: omegaconf.dictconfig.DictConfig):
+    def __init__(self, conf: Union[DictConfig, ListConfig]):
         super().__init__()
         self.save_hyperparameters()
         self.conf = conf
@@ -19,7 +21,7 @@ class MyModel(pl.LightningModule):
             return_dict=True,
             output_hidden_states=True,
         )
-        self.drop = torch.nn.Dropout(p=conf["model"]["dropout"])
+        self.drop = torch.nn.Dropout(p=conf.model.dropout)
         self.fc = torch.nn.LazyLinear(out_features=2)
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
@@ -33,26 +35,34 @@ class MyModel(pl.LightningModule):
             return logits, loss
         return logits
 
-    def training_step(self, batch: Any, batch_idx: int, dataloader_idx=0):
+    def training_step(
+        self, batch: Any, batch_idx: int, dataloader_idx=0
+    ) -> Dict[str, Tensor]:
         image, labels = batch
         _, loss = self(image, labels)
         self.log("train_loss", loss, on_step=True, on_epoch=False, prog_bar=True)
         return {"loss": loss}
 
-    def validation_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0):
+    def validation_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> Dict[str, Tensor]:
         image, labels = batch
         _, loss = self(image, labels)
         self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=False)
         return {"val_loss": loss}
 
-    def test_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0):
+    def test_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> Dict[str, Tensor]:
         image, labels = batch
         logits, loss = self(image, labels)
         self.log("test_loss", loss, on_step=True, on_epoch=True, prog_bar=False)
 
         return {"logits": logits, "labels": labels}
 
-    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
+    def predict_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> Dict[str, Tensor]:
         image, _ = batch
         logits = self(image)
 
@@ -60,7 +70,7 @@ class MyModel(pl.LightningModule):
 
         return {"logits": logits, "probabilities": probabilities}
 
-    def configure_optimizers(self) -> Any:
+    def configure_optimizers(self) -> OptimizerLRScheduler:
         param_optimizer = list(self.named_parameters())
         no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
         optimizer_grouped_parameters = [
@@ -68,7 +78,7 @@ class MyModel(pl.LightningModule):
                 "params": [
                     p for n, p in param_optimizer if not any(nd in n for nd in no_decay)
                 ],
-                "weight_decay": self.conf["train"]["weight_decay"],
+                "weight_decay": self.conf.train.weight_decay,
             },
             {
                 "params": [
@@ -79,12 +89,12 @@ class MyModel(pl.LightningModule):
         ]
         optimizer = torch.optim.AdamW(
             optimizer_grouped_parameters,
-            lr=self.conf["train"]["learning_rate"],
+            lr=self.conf.train.learning_rate,
         )
         lr_scheduler = transformers.get_cosine_schedule_with_warmup(
             optimizer,
-            num_warmup_steps=self.conf["train"]["num_warmup_steps"],
-            num_training_steps=self.conf["train"]["num_training_steps"],
+            num_warmup_steps=self.conf.train.num_warmup_steps,
+            num_training_steps=self.conf.train.num_training_steps,
         )
         return [optimizer], [{"scheduler": lr_scheduler, "interval": "step"}]
 
