@@ -160,3 +160,4 @@ cython_debug/
 .idea/
 /.idea/modules.xml
 /data/lightning_logs/
+/hse_mlops_hw/outputs/

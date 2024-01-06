@@ -8,7 +8,7 @@ data:
   test_folder: ../data/test
   val_size: 0.2
   dataloader_num_workers: 4
-  batch_size: 32
+  batch_size: 8
 
 
 labels:
@@ -16,14 +16,15 @@ labels:
   - dog
 
 train:
+  max_epochs: 10
   learning_rate: 2e-5
   weight_decay: 0.01
-  num_warmup_steps: 1
-  num_training_steps: 1
+  num_warmup_steps: 2
+  num_training_steps: 100
   grad_accum_steps: 2
   accelerator: auto
   devices: auto
-  precision: bf16-mixed
+  precision: 32
   val_check_interval: 1.0
   overfit_batches: 0
   num_sanity_val_steps: 1
@@ -32,19 +33,21 @@ train:
   gradient_clip_val: 1.0
   profiler:
   log_every_n_steps: 1
-  batch_size_finder: false
-  detect_anomaly: false
+  batch_size_finder: False
+  detect_anomaly: False
+  limit_train_batches: 0.2
+  max_batches: 1
 
 artifacts:
   experiment_name: example-experiment
   tracking_uri: postgresql://test:test@localhost:5432/mlflow
   checkpoint:
-    use: False
+    use: True
     dirpath: ../data
     filename: "{epoch:02d}-{val_loss:.4f}"
     monitor: val_loss
     save_top_k: 3
-    every_n_train_steps:
+    every_n_train:
     every_n_epochs: 1
 
 callbacks:
