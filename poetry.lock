@@ -208,6 +208,19 @@ tests = ["attrs[tests-no-zope]", "zope-interface"]
 tests-no-zope = ["cloudpickle", "hypothesis", "mypy (>=1.1.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
 
 [[package]]
+name = "bfloat16"
+version = "1.2.0"
+description = "Numpy bfloat16 package"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "bfloat16-1.2.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:25a2d44d2e814f5bcccf53eaa79066093e1deb9562291af80f6acd66b1f9df62"},
+    {file = "bfloat16-1.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e6e6034e028c4ab4b59fda5a60328d75c8526cddbaf58f2648fcff2edc2cddbb"},
+    {file = "bfloat16-1.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:789feeb13ba24a78db095c6ccf25c38a5f9ee639e555f1c4b1d60ab296ae4450"},
+    {file = "bfloat16-1.2.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:05adae82e315904f79ada36992f3f9b0b3f79a2a253e8bd1012550f4df3c7e44"},
+]
+
+[[package]]
 name = "black"
 version = "23.12.1"
 description = "The uncompromising code formatter."
@@ -2067,6 +2080,17 @@ files = [
 [package.dependencies]
 antlr4-python3-runtime = "==4.9.*"
 PyYAML = ">=5.1.0"
+
+[[package]]
+name = "overrides"
+version = "7.4.0"
+description = "A decorator to automatically detect mismatch when overriding a method."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "overrides-7.4.0-py3-none-any.whl", hash = "sha256:3ad24583f86d6d7a49049695efe9933e67ba62f0c7625d53c59fa832ce4b8b7d"},
+    {file = "overrides-7.4.0.tar.gz", hash = "sha256:9502a3cca51f4fac40b5feca985b6703a5c1f6ad815588a7ca9e285b9dca6757"},
+]
 
 [[package]]
 name = "packaging"
@@ -3992,4 +4016,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4daa9c1d91ef63377ac6968263f6b19e2439c1220673fc29124b28f486e3dcc2"
+content-hash = "bc887e090c2664056499f011a9058cbc740790e672ee9dc01e1851ee1d1641fb"

@@ -1,13 +1,12 @@
 __all__ = "CSVPredictionWriter"
 
-import csv
 import logging
 import os
 from pathlib import Path
-from typing import Any, Literal, Optional, Sequence
+from typing import Any, Literal, Optional, Sequence, Union
 
 import lightning.pytorch as pl
-import torch
+import pandas as pd
 from lightning.fabric.loggers import CSVLogger
 from lightning.pytorch.callbacks import BasePredictionWriter
 
@@ -20,8 +19,8 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
 
     def __init__(
         self,
-        output_dir: str,
-        name: str,
+        output_dir: Union[Path, str],
+        name: str = "predictions",
         write_interval: Literal["batch", "epoch", "batch_and_epoch"] = "batch",
     ):
         super().__init__(write_interval=write_interval)
@@ -45,26 +44,17 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
         batch_idx: int,
         dataloader_idx: int,
     ) -> None:
-        torch.save(
-            prediction,
-            self.get_writing_path(f"batch_{batch_idx}.pt"),
-        )
-        self.log_predictions_to_csv(prediction, batch_idx, name="predictions.csv")
+        self.log_predictions_to_csv(prediction, batch_idx, name=f"{self.name}.csv")
 
     def write_on_epoch_end(
         self,
         trainer: "pl.Trainer",
         pl_module: "pl.LightningModule",
-        predictions: Sequence[Any],
+        predictions: dict,  # type: ignore[override]
         batch_indices: Sequence[Any],
     ) -> None:
-        torch.save(
-            predictions,
-            self.get_writing_path("predictions.pt"),
-        )
-
         if self.interval == "epoch":
-            self.log_predictions_to_csv(predictions, name="predictions.csv")
+            self.log_predictions_to_csv(predictions, name=f"{self.name}.csv")
 
     def get_writing_path(self, filename: Optional[str]) -> str:
         """Get writing path and insure its existence before writing"""
@@ -74,16 +64,22 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
 
     def log_predictions_to_csv(
         self,
-        predictions: Sequence[Any],
+        predictions: dict,
         batch_idx: Optional[int] = None,
         name: Optional[str] = None,
     ) -> None:
+        """Log predictions to csv file"""
         path = self.get_writing_path(name)
-        with open(path, "a", newline="", encoding="utf8") as csv_file:
-            csv_writer = csv.writer(csv_file)
-            for pred in predictions:
-                row = {"Prediction": pred, "BatchIndex": batch_idx}
-                csv_writer.writerow(row.values())
+
+        logits_list = predictions["logits"].cpu().numpy(force=True).tolist()
+
+        probabilities_list = (
+            predictions["probabilities"].cpu().numpy(force=True).tolist()
+        )
+
+        df = pd.DataFrame({"logits": logits_list, "probabilities": probabilities_list})
+
+        df.to_csv(path, mode="a", header=False, index=False)
 
     @staticmethod
     def ensure_path(directory_path: Path):

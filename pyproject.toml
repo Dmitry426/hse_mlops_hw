@@ -24,11 +24,14 @@ rich = "^13.7.0"
 psutil = "^5.9.7"
 timm = "^0.9.12"
 tensorboard = "^2.15.1"
+overrides = "^7.4.0"
+bfloat16 = "^1.2.0"
 
 
 
 [tool.poetry.scripts]
-greet = "hse_mlops_hw.cmd.commands:cli"
+train = "your_module.command:train"
+infer = "your_module.command:infer"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"
@@ -120,13 +123,6 @@ good-names = []
 ignore-imports = true
 ignore-docstrings = true
 ignore-comments = true
-
-
-[tool.pytest.ini_options]
-asyncio_mode = "strict"
-log_cli = true
-log_cli_level = "INFO"
-log_cli_format = "%(levelname)-5.5s [%(name)s] %(message)s"
 
 
 [build-system]
