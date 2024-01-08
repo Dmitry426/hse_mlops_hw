@@ -13,6 +13,7 @@ from lightning.pytorch.callbacks import BasePredictionWriter
 logger = logging.getLogger(__name__)
 
 
+# pylint: disable=unused-argument
 class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
     """Csv prediction writer"""
 
