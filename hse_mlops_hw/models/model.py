@@ -1,18 +1,18 @@
 __all__ = "MyModel"
 
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 import lightning.pytorch as pl
 import torch
 import transformers
 from lightning.pytorch.utilities.types import OptimizerLRScheduler
-from omegaconf import DictConfig, ListConfig
+from omegaconf import DictConfig
 from torch import Tensor
 
 
 # pylint: disable=unused-argument
 class MyModel(pl.LightningModule):
-    def __init__(self, conf: Union[DictConfig, ListConfig]):
+    def __init__(self, conf: DictConfig):
         super().__init__()
         self.save_hyperparameters()
         self.conf = conf

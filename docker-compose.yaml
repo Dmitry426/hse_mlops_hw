@@ -41,5 +41,18 @@ services:
       - 6006:6006
     command: tensorboard  --bind_all --logdir=/${TENSORBOARD_LOGS_DIR}/
 
+  dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/ops_app/Dockerfile
+    volumes:
+      - ./hse_mlops_hw:/src/hse_mlops_hw
+      - ./data:/src/data
+      - ./configs:/src/configs
+      - ./.dvc:/src/.dvc
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
 volumes:
   postgres:

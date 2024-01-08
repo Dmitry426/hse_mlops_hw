@@ -2,7 +2,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import lightning.pytorch as pl
 
@@ -12,14 +12,13 @@ logger = logging.getLogger(__name__)
 class BestModelGetter:
     """Get best checkpoint by loss for inference"""
 
-    def __init__(
-        self, model, experiment_path: Union[str, Path], loss: str = "val_loss"
-    ):
+    def __init__(self, model, experiment_path: str | Path, loss: str = "val_loss"):
         self.model = model
         self.experiment_path = Path(experiment_path)
         self.loss = loss
 
     def get_best_model(self) -> pl.LightningModule:
+        """Get the best model checkpoint for inference"""
         best_checkpoint = self.get_best_checkpoint_on_l_loss()
 
         checkpoint_path = self.experiment_path / best_checkpoint
