@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Union
 
+import hydra
 import lightning.pytorch as pl
 import torch
 from lightning.pytorch.loggers import CSVLogger, MLFlowLogger
 from lightning.pytorch.tuner import Tuner
-from omegaconf import DictConfig, ListConfig, OmegaConf
+from omegaconf import DictConfig
 
 from hse_mlops_hw import PROJECT_ROOT
 from hse_mlops_hw.data.data import MyDataModule
@@ -13,7 +13,7 @@ from hse_mlops_hw.models.model import MyModel
 
 
 class Trainer:
-    def __init__(self, cfg: Union[DictConfig, ListConfig]):
+    def __init__(self, cfg: DictConfig):
         self.cfg = cfg
 
     def train(self) -> None:
@@ -94,14 +94,15 @@ class Trainer:
         trainer.fit(model, datamodule=dm)
 
 
-def train(
-    config_path: str = "../configs/config.yaml", version_base: str = "1.3"
-) -> None:
-    cfg = OmegaConf.load(config_path)
-    cfg.version_base = version_base
-
+@hydra.main(
+    config_path=str(PROJECT_ROOT / "configs"),
+    config_name="config.yaml",
+    version_base="1.3",
+)
+def train(cfg: DictConfig) -> None:
     Trainer(cfg).train()
 
 
+# pylint: disable=no-value-for-parameter
 if __name__ == "__main__":
     train()

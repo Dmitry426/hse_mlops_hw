@@ -15,11 +15,11 @@ In these run modes, it's possible to update the application code on the fly with
 #### Python Runner train
 
 ```bash
- python3 hse_mlops_hw/train.py
+ poetry run train
 ```
 #### Python Runner infer
 ```bash
- python3 hse_mlops_hw/infer.py
+ poetry run infer
 ```
 
 #### Docker mlfow runner

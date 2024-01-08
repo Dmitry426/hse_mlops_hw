@@ -1,54 +1,10 @@
-model:
-  name: facebook/detr-resnet-50
-  dropout: 0.5
-  freeze_backbone: false
-
-data:
-  train_folder: ../data/train
-  test_folder: ../data/test
-  val_size: 0.2
-  dataloader_num_workers: 4
-  batch_size: 8
-
-
-labels:
-  - cat
-  - dog
-
-train:
-  max_epochs: 10
-  learning_rate: 2e-5
-  weight_decay: 0.01
-  num_warmup_steps: 2
-  num_training_steps: 100
-  grad_accum_steps: 2
-  accelerator: auto
-  devices: auto
-  precision: 32
-  val_check_interval: 1.0
-  overfit_batches: 0
-  num_sanity_val_steps: 1
-  full_deterministic_mode: false
-  benchmark: false
-  gradient_clip_val: 1.0
-  profiler:
-  log_every_n_steps: 1
-  batch_size_finder: False
-  detect_anomaly: False
-  limit_train_batches: 0.2
-  max_batches: 1
-
-artifacts:
-  experiment_name: example-experiment
-  tracking_uri: postgresql://test:test@localhost:5432/mlflow
-  checkpoint:
-    use: True
-    dirpath: ../data
-    filename: "{epoch:02d}-{val_loss:.4f}"
-    monitor: val_loss
-    save_top_k: 3
-    every_n_train:
-    every_n_epochs: 1
+defaults:
+  - model: base_model.yaml
+  - data: base_data.yaml
+  - train: base_train.yaml
+  - artifacts: base_artifacts.yaml
+  - inference: base_inference.yaml
+  - _self_
 
 callbacks:
   model_summary:

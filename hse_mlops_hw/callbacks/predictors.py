@@ -3,7 +3,7 @@ __all__ = "CSVPredictionWriter"
 import logging
 import os
 from pathlib import Path
-from typing import Any, Literal, Optional, Sequence, Union
+from typing import Any, Literal, Optional, Sequence
 
 import lightning.pytorch as pl
 import pandas as pd
@@ -19,7 +19,7 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
 
     def __init__(
         self,
-        output_dir: Union[Path, str],
+        output_dir: Path | str,
         name: str = "predictions",
         write_interval: Literal["batch", "epoch", "batch_and_epoch"] = "batch",
     ):
@@ -44,7 +44,7 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
         batch_idx: int,
         dataloader_idx: int,
     ) -> None:
-        self.log_predictions_to_csv(prediction, batch_idx, name=f"{self.name}.csv")
+        self.log_predictions_to_csv(prediction, name=f"{self.name}.csv")
 
     def write_on_epoch_end(
         self,
@@ -65,7 +65,6 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
     def log_predictions_to_csv(
         self,
         predictions: dict,
-        batch_idx: Optional[int] = None,
         name: Optional[str] = None,
     ) -> None:
         """Log predictions to csv file"""
@@ -82,7 +81,7 @@ class CSVPredictionWriter(BasePredictionWriter, CSVLogger):
         df.to_csv(path, mode="a", header=False, index=False)
 
     @staticmethod
-    def ensure_path(directory_path: Path):
+    def ensure_path(directory_path: Path) -> None:
         """Check if directory and do creation if it doesn't exist"""
         if not os.path.exists(directory_path):
             os.makedirs(directory_path)

@@ -1,0 +1,9 @@
+train_path: data/train
+test_path: data/test
+val_size: 0.2
+dataloader_num_workers: 4
+batch_size: 8
+
+labels:
+  - cat
+  - dog

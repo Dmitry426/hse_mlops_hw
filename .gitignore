@@ -161,3 +161,6 @@ cython_debug/
 /.idea/modules.xml
 /data/lightning_logs/
 /hse_mlops_hw/outputs/
+/outputs/
+/hse_mlops_hw/mlruns/
+/mlruns/
