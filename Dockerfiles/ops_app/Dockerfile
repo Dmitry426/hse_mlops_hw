@@ -17,7 +17,7 @@ ENV PYTHONFAULTHANDLER=1 \
 RUN mkdir /src
 RUN mkdir /src/hse_mlops_hw
 
-WORKDIR /src/hse_mlops_hw
+WORKDIR /src
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     curl \
@@ -25,9 +25,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 RUN curl -sSL https://install.python-poetry.org | python -
 
-# install dependencies
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-dev --no-root --no-interaction --no-ansi
+
+COPY hse_mlops_hw ./src/hse_mlops_hw
+
+
+RUN poetry install --no-dev  --no-interaction --no-ansi
 
 
 CMD ["tail", "-f", "/dev/null"]

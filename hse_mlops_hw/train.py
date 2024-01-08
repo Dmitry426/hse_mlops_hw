@@ -100,6 +100,7 @@ class Trainer:
     version_base="1.3",
 )
 def train(cfg: DictConfig) -> None:
+    """Train a model"""
     Trainer(cfg).train()
 
 

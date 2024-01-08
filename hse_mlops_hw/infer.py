@@ -49,6 +49,7 @@ class Inference:
     version_base="1.3",
 )
 def infer(cfg: DictConfig) -> None:
+    """Infer best train experiment"""
     Inference(cfg).infer()
 
 

@@ -164,3 +164,7 @@ cython_debug/
 /outputs/
 /hse_mlops_hw/mlruns/
 /mlruns/
+/hse_mlops_hw/outputs/
+/outputs/
+/hse_mlops_hw/mlruns/
+/mlruns/
