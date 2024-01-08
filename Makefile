@@ -25,12 +25,26 @@ lint: isort black mypy pylint flake8
 
 check_and_rename_env:
 	  @if [ -e ".env" ]; then \
-    	chmod +r .env \
-    	. .env | \
         echo "env file exists."; \
       else \
       	cp .env.example .env | \
-      	chmod +r .env | \
-      	. .env | \
         echo "File does not exist."; \
       fi
+
+build_docker_metrics: check_and_rename_env
+	docker compose -f docker-compose.metrics.yaml build
+
+build_docker_dev:check_and_rename_env
+	docker compose -f docker-compose.dev.yaml build
+
+run_metrics:
+	docker compose -f docker-compose.metrics.yaml up
+
+metrics_stop:
+	docker compose -f docker-compose.metrics.yaml up
+
+infer:
+	docker compose -f docker-compose.dev.yaml run dev poetry run infer $(ARGUMENTS)
+
+train:
+	docker compose -f docker-compose.dev.yaml run dev poetry run train $(ARGUMENTS)
