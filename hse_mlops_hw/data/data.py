@@ -1,32 +1,36 @@
 __all__ = "MyDataModule"
 
 import logging
-import os
 import subprocess
 import sys
-from typing import List, Union
+from pathlib import Path
+from typing import List
 
 import lightning.pytorch as pl
-from omegaconf import DictConfig, ListConfig
+from omegaconf import DictConfig
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
+from torchvision.transforms import Compose
+
+from hse_mlops_hw import PROJECT_ROOT
 
 logger = logging.getLogger(__name__)
 
 
 class CatDogDataset(Dataset):
-    def __init__(self, root_dir, classes: List, transform=None):
+    def __init__(self, root_dir: Path, classes: List, transform: Compose = None):
         self.root_dir = root_dir
         self.transform = transform
         self.classes = classes
         self.data = []
 
         for class_label in self.classes:
-            class_path = os.path.join(root_dir, class_label)
+            class_path = Path(root_dir) / class_label
             class_idx = self.classes.index(class_label)
-            for img_name in os.listdir(str(class_path)):
-                img_path = os.path.join(str(class_path), img_name)
+
+            for img_name in class_path.iterdir():
+                img_path = str(img_name)
                 self.data.append((img_path, class_idx))
 
     def __len__(self):
@@ -43,25 +47,25 @@ class CatDogDataset(Dataset):
 
 
 class MyDataModule(pl.LightningDataModule):
-    def __init__(self, config: Union[DictConfig, ListConfig]):
+    def __init__(self, config: DictConfig):
         super().__init__()
         self.config = config
-        self.train_folder = config.data.train_folder
-        self.test_folder = config.data.test_folder
+        self.train_path = self._ensure_path(config.data.train_path)
+        self.test_path = self._ensure_path(config.data.test_path)
         self.val_size = config.data.val_size
         self.batch_size = config.data.batch_size
         self.dataloader_num_workers = config.data.dataloader_num_workers
 
-        self.transform = transforms.Compose(
+        self.transform = Compose(
             [
                 transforms.Resize((224, 224)),
                 transforms.ToTensor(),
             ]
         )
-        self.classes = config.labels
-        self.train_dataset = None
-        self.val_dataset = None
-        self.predict_dataset = None
+        self.classes = config.data.labels
+        self.train_dataset: CatDogDataset
+        self.val_dataset: CatDogDataset
+        self.predict_dataset: CatDogDataset
 
     def prepare_data(self):
         try:
@@ -75,7 +79,7 @@ class MyDataModule(pl.LightningDataModule):
 
     def setup(self, stage=None):
         train_dataset = CatDogDataset(
-            root_dir=self.train_folder, transform=self.transform, classes=self.classes
+            root_dir=self.train_path, transform=self.transform, classes=self.classes
         )
         train_size = int((1.0 - self.val_size) * len(train_dataset))
         val_size = len(train_dataset) - train_size
@@ -84,10 +88,10 @@ class MyDataModule(pl.LightningDataModule):
         )
 
         self.predict_dataset = CatDogDataset(
-            root_dir=self.test_folder, transform=self.transform, classes=self.classes
+            root_dir=self.test_path, transform=self.transform, classes=self.classes
         )
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> DataLoader:
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
@@ -95,7 +99,7 @@ class MyDataModule(pl.LightningDataModule):
             num_workers=self.dataloader_num_workers,
         )
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> DataLoader:
         return DataLoader(
             self.val_dataset,
             batch_size=self.batch_size,
@@ -103,10 +107,29 @@ class MyDataModule(pl.LightningDataModule):
             num_workers=self.dataloader_num_workers,
         )
 
-    def predict_dataloader(self):
+    def predict_dataloader(self) -> DataLoader:
         return DataLoader(
             self.predict_dataset,
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.dataloader_num_workers,
         )
+
+    @staticmethod
+    def _ensure_path(path: str | Path, project_root: Path = PROJECT_ROOT) -> Path:
+        """
+        Ensure that the given path exists and is
+        absolute or relative to the project root.
+        """
+        path = Path(path)
+
+        if path.is_absolute() and path.exists():
+            return path
+        else:
+            absolute_path = project_root / path
+            if absolute_path.exists():
+                return absolute_path
+            else:
+                error_message = f"The path '{absolute_path}' does not exist."
+                logging.error(error_message)
+                raise FileNotFoundError(error_message)
