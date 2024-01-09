@@ -12,6 +12,21 @@ from torch import Tensor
 
 # pylint: disable=unused-argument
 class MyModel(pl.LightningModule):
+    """
+    PyTorch Lightning Module representing your custom model.
+
+    Args:
+        conf (DictConfig): Configuration object containing model settings.
+
+    Attributes:
+        conf (DictConfig): Configuration object containing model settings.
+        backbone (transformers.PreTrainedModel): Pre-trained transformer model.
+        drop (torch.nn.Dropout): Dropout layer.
+        fc (torch.nn.LazyLinear): Linear layer for classification.
+        loss_fn (torch.nn.CrossEntropyLoss): Cross-entropy loss function.
+
+    """
+
     def __init__(self, conf: DictConfig):
         super().__init__()
         self.save_hyperparameters()
@@ -26,6 +41,10 @@ class MyModel(pl.LightningModule):
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
     def forward(self, image, labels=None):
+        """
+        Forward pass of the model.
+
+        """
         embeddings = self.backbone(image)["last_hidden_state"][:, 0]
         embeddings = self.drop(embeddings)
         logits = self.fc(embeddings)
@@ -38,6 +57,10 @@ class MyModel(pl.LightningModule):
     def training_step(
         self, batch: Any, batch_idx: int, dataloader_idx=0
     ) -> Dict[str, Tensor]:
+        """
+        Training step implementation.
+
+        """
         image, labels = batch
         _, loss = self(image, labels)
         self.log("train_loss", loss, on_step=True, on_epoch=False, prog_bar=True)
@@ -46,6 +69,10 @@ class MyModel(pl.LightningModule):
     def validation_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0
     ) -> Dict[str, Tensor]:
+        """
+        Validation step implementation.
+
+        """
         image, labels = batch
         _, loss = self(image, labels)
         self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=False)
@@ -54,15 +81,22 @@ class MyModel(pl.LightningModule):
     def test_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0
     ) -> Dict[str, Tensor]:
+        """
+        Test step implementation.
+
+        """
         image, labels = batch
         logits, loss = self(image, labels)
         self.log("test_loss", loss, on_step=True, on_epoch=True, prog_bar=False)
-
         return {"logits": logits, "labels": labels}
 
     def predict_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0
     ) -> Dict[str, Tensor]:
+        """
+        Prediction step implementation.
+
+        """
         image, _ = batch
         logits = self(image)
 
@@ -71,6 +105,10 @@ class MyModel(pl.LightningModule):
         return {"logits": logits, "probabilities": probabilities}
 
     def configure_optimizers(self) -> OptimizerLRScheduler:
+        """
+        Configured AdaW optimizer scheduler
+
+        """
         param_optimizer = list(self.named_parameters())
         no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
         optimizer_grouped_parameters = [
@@ -99,5 +137,9 @@ class MyModel(pl.LightningModule):
         return [optimizer], [{"scheduler": lr_scheduler, "interval": "step"}]
 
     def on_before_optimizer_step(self, optimizer):
+        """
+        Callback executed before each optimizer step.
+
+        """
         self.log_dict(pl.utilities.grad_norm(self, norm_type=2))
         super().on_before_optimizer_step(optimizer)

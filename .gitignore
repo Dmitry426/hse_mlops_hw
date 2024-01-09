@@ -168,3 +168,5 @@ cython_debug/
 /outputs/
 /hse_mlops_hw/mlruns/
 /mlruns/
+/data/model/
+/data/checkpoints/

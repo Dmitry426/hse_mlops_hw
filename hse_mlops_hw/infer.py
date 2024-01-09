@@ -1,3 +1,5 @@
+__all__ = "Inference"
+
 import hydra
 import lightning.pytorch as pl
 from omegaconf import DictConfig
@@ -10,17 +12,41 @@ from hse_mlops_hw.services.getter import BestModelGetter
 
 
 class Inference:
+    """
+    Inference class for making predictions with a pre-trained PyTorch Lightning model.
+
+    Args:
+        cfg (DictConfig): Configuration object containing inference settings.
+
+    Attributes:
+        cfg (DictConfig): Configuration object containing inference settings.
+
+    Methods:
+        infer(): Main method for making predictions using the specified model.
+
+
+    """
+
     def __init__(self, cfg: DictConfig):
         self.cfg = cfg
 
-    def infer(self):
+    def infer(self) -> None:
+        """
+        Main method for making predictions using the specified PyTorch Lightning model.
+
+        This method loads the best model from the checkpoint directory, initializes
+        the data module, and uses the PyTorch Lightning Trainer for making predictions.
+
+        """
         pl.seed_everything(42)
 
         output_folder = PROJECT_ROOT / "data"
 
         model = BestModelGetter(
             model=MyModel,
-            experiment_path=output_folder / self.cfg.artifacts.experiment_name,
+            experiment_path=output_folder
+            / self.cfg.artifacts.checkpoint.dirpath
+            / self.cfg.artifacts.experiment_name,
         ).get_best_model()
 
         data_module = MyDataModule(config=self.cfg)

@@ -11,10 +11,10 @@ val_check_interval: 1.0
 overfit_batches: 0
 num_sanity_val_steps: 5
 full_deterministic_mode: false
-benchmark: false
+benchmark: true
 gradient_clip_val: 1.0
 profiler: null
 log_every_n_steps: 1
 batch_size_finder: false
 detect_anomaly: false
-limit_train_batches: 0.2
+limit_train_batches:
