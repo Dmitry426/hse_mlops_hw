@@ -25,7 +25,7 @@ def infer(
         Defaults to "test_run".
         config_name (str, optional): Name of the configuration file.
          Defaults to "config".
-        overrides (List[str], optional): List of overrides for the configuration.
+        overrides (List[str], optional): List of overrides for the Hydra configuration.
          Defaults to None.
         return_hydra_config (bool, optional): Whether to return the Hydra config.
          Defaults to False.
@@ -71,7 +71,7 @@ def train(
          Defaults to "test_run".
         config_name (str, optional): Name of the configuration file.
         Defaults to "config".
-        overrides (List[str], optional): List of overrides for the configuration.
+        overrides (List[str], optional): List of overrides for the Hydra configuration.
          Defaults to None.
         return_hydra_config (bool, optional): Whether to return the Hydra config.
         Defaults to False.
