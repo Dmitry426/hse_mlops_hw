@@ -1,5 +1,5 @@
 # HSE MLops Project
-This is the final project for Mlops from [girafe.ai](https://github.com/girafe-ai)
+This is the final project for Mlops course from [girafe.ai](https://github.com/girafe-ai)
 
 ## Goals
 The main goal is to study new MLOps techniques.
