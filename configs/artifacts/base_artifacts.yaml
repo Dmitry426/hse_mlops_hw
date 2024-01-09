@@ -1,5 +1,5 @@
 experiment_name: example-experiment
-tracking_uri: http://localhost:5000
+tracking_uri: http://128.0.1.1:8080
 checkpoint:
   use: True
   dirpath: checkpoints
