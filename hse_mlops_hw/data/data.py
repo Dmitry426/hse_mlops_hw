@@ -47,6 +47,11 @@ class CatDogDataset(Dataset):
 
 
 class MyDataModule(pl.LightningDataModule):
+    """
+    PyTorch Lightning DataModule for handling data loading and processing.
+
+    """
+
     def __init__(self, config: DictConfig):
         super().__init__()
         self.config = config
@@ -68,6 +73,7 @@ class MyDataModule(pl.LightningDataModule):
         self.predict_dataset: CatDogDataset
 
     def prepare_data(self):
+        """Script aimed to pull data from dvc"""
         try:
             subprocess.run(["dvc", "pull"], check=True)
             logger.info("DVC pull completed successfully.")
@@ -78,6 +84,13 @@ class MyDataModule(pl.LightningDataModule):
             sys.exit(1)
 
     def setup(self, stage=None):
+        """
+        Set up the training, validation, and prediction datasets.
+
+        This method initializes the training dataset, performs a random split to create
+        the training and validation datasets, and initializes the prediction dataset.
+
+        """
         train_dataset = CatDogDataset(
             root_dir=self.train_path, transform=self.transform, classes=self.classes
         )

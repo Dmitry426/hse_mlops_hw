@@ -1,9 +1,17 @@
+__all__ = "Trainer"
+
 from pathlib import Path
 
 import hydra
 import lightning.pytorch as pl
 import torch
-from lightning.pytorch.loggers import CSVLogger, MLFlowLogger
+from lightning.pytorch.callbacks import (
+    DeviceStatsMonitor,
+    LearningRateMonitor,
+    ModelCheckpoint,
+    RichModelSummary,
+)
+from lightning.pytorch.loggers import CSVLogger, MLFlowLogger, TensorBoardLogger
 from lightning.pytorch.tuner import Tuner
 from omegaconf import DictConfig
 
@@ -13,10 +21,31 @@ from hse_mlops_hw.models.model import MyModel
 
 
 class Trainer:
+    """
+    Trainer class for training a PyTorch Lightning model.
+
+    Args:
+        cfg (DictConfig): Configuration object containing training settings.
+
+    Attributes:
+        cfg (DictConfig): Configuration object containing training settings.
+
+    Methods:
+        train(): Main method for training the PyTorch Lightning model.
+
+    """
+
     def __init__(self, cfg: DictConfig):
         self.cfg = cfg
 
     def train(self) -> None:
+        """
+        Main method for training the PyTorch Lightning model.
+
+        This method initializes the data module, model, loggers, and callbacks,
+        and then trains the model using the configured trainer settings.
+
+        """
         pl.seed_everything(42)
 
         torch.set_float32_matmul_precision("medium")
@@ -32,26 +61,25 @@ class Trainer:
                 name=self.cfg.artifacts.experiment_name,
             ),
             MLFlowLogger(
+                save_dir=str(output_folder / "mlruns"),
                 experiment_name=self.cfg.artifacts.experiment_name,
                 tracking_uri=self.cfg.artifacts.tracking_uri,
             ),
-            pl.loggers.TensorBoardLogger(
+            TensorBoardLogger(
                 f"{output_folder}/logs/tensorboard",
                 name=self.cfg.artifacts.experiment_name,
             ),
         ]
 
         callbacks = [
-            pl.callbacks.LearningRateMonitor(logging_interval="step"),
-            pl.callbacks.DeviceStatsMonitor(),
-            pl.callbacks.RichModelSummary(
-                max_depth=self.cfg.callbacks.model_summary.max_depth
-            ),
+            LearningRateMonitor(logging_interval="step"),
+            DeviceStatsMonitor(),
+            RichModelSummary(max_depth=self.cfg.callbacks.model_summary.max_depth),
         ]
 
         if self.cfg.artifacts.checkpoint.use:
             callbacks.append(
-                pl.callbacks.ModelCheckpoint(
+                ModelCheckpoint(
                     dirpath=output_folder
                     / self.cfg.artifacts.checkpoint.dirpath
                     / self.cfg.artifacts.experiment_name,

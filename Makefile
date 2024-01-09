@@ -32,7 +32,7 @@ check_and_rename_env:
       fi
 
 build_docker_metrics: check_and_rename_env
-	docker compose -f docker-compose.metrics.yaml build
+	docker-compose -f docker-compose.metrics.yaml build
 
 build_docker_dev:check_and_rename_env
 	docker compose -f docker-compose.dev.yaml build
