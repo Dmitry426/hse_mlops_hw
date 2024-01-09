@@ -1,6 +1,12 @@
 # HSE MLops Project
+This is the final project for Mlops from [girafe.ai](https://github.com/girafe-ai)
 
-## Application Launch
+## Goals
+The main goal is to study new MLOps techniques.
+To achieve this, I took the classic cat vs dog problem and,
+with the help of various pretrained models from Hugging Face,
+trained a neural network with high quality.
+The stack includes Hydra, PyTorch, and Lightning.
 
 ### Development
 
